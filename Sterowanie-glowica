@@ -1,0 +1,215 @@
+/* Dariusz Odzierejko, Oskar Łucewicz, Kacper Lipiński 2019 */
+
+#define X_STEP_PIN         54
+
+#define X_DIR_PIN          55
+
+#define X_ENABLE_PIN       38
+
+#ifndef X_CS_PIN
+
+#define X_CS_PIN         53
+
+#endif
+
+
+
+#define Y_STEP_PIN         60
+
+#define Y_DIR_PIN          61
+
+#define Y_ENABLE_PIN       56
+
+#ifndef Y_CS_PIN
+
+#define Y_CS_PIN         49
+
+#endif
+
+
+
+#define Z_STEP_PIN         46
+
+#define Z_DIR_PIN          48
+
+#define Z_ENABLE_PIN       62
+
+#ifndef Z_CS_PIN
+
+#define Z_CS_PIN         40
+
+#endif
+
+
+
+#define X_MIN_PIN           3
+
+#ifndef X_MAX_PIN
+
+#define X_MAX_PIN         2
+
+#endif
+
+#define Y_MIN_PIN          14
+
+#define Y_MAX_PIN          15
+
+#define Z_MIN_PIN          18
+
+#define Z_MAX_PIN          19
+
+
+
+
+
+int s = 0;
+
+int dir = 1;
+
+String a;
+String b;
+String c;
+int s1 = 0;
+int s2 = 0;
+int s3 = 0;
+bool odpowiedz = 0;
+
+
+void setup() {
+
+  
+  pinMode(X_ENABLE_PIN, OUTPUT);
+
+  digitalWrite(X_ENABLE_PIN, LOW);
+
+  pinMode(X_DIR_PIN, OUTPUT);
+
+  digitalWrite(X_DIR_PIN, LOW);
+
+  pinMode(X_STEP_PIN, OUTPUT);
+
+
+
+  pinMode(Y_ENABLE_PIN, OUTPUT);
+
+  digitalWrite(Y_ENABLE_PIN, LOW);
+
+  pinMode(Y_DIR_PIN, OUTPUT);
+
+  digitalWrite(Y_DIR_PIN, LOW);
+
+  pinMode(Y_STEP_PIN, OUTPUT);
+
+
+
+  pinMode(Z_ENABLE_PIN, OUTPUT);
+
+  digitalWrite(Z_ENABLE_PIN, LOW);
+
+  pinMode(Z_DIR_PIN, OUTPUT);
+
+  digitalWrite(Z_DIR_PIN, LOW);
+
+  pinMode(Z_STEP_PIN, OUTPUT);
+
+  
+
+  pinMode(X_MAX_PIN, INPUT_PULLUP);
+
+  pinMode(Y_MAX_PIN, INPUT_PULLUP);
+
+  pinMode(Z_MAX_PIN, INPUT_PULLUP);
+
+  
+  Serial.begin(115200);
+}
+
+
+void loop() {  
+
+// sterowanie silnikami
+
+if (((digitalRead(X_MAX_PIN) == LOW && dir == LOW) || dir == HIGH) && s1>0)
+{
+  digitalWrite(X_STEP_PIN, HIGH);
+  s1--;
+}
+
+if (((digitalRead(Y_MAX_PIN) == LOW && dir == LOW) || dir == HIGH) && s2>0)
+{
+  digitalWrite(Y_STEP_PIN, HIGH);
+  s2--;
+}
+
+if (((digitalRead(Z_MAX_PIN) == LOW && dir == LOW) || dir == HIGH) && s3>0)
+{
+  digitalWrite(Z_STEP_PIN, HIGH);
+  s3--;
+}
+
+  delay(1);
+
+  digitalWrite(X_STEP_PIN, LOW);
+
+  digitalWrite(Y_STEP_PIN, LOW);
+
+  digitalWrite(Z_STEP_PIN, LOW);
+
+  delay(1);
+
+// koniec sterowania silnikami
+
+  
+  int dir1 = 0;
+  int dir2 = 0;
+  int dir3 = 0;
+  
+  while(Serial.available()>0)
+  {
+    a = Serial.readStringUntil('\n');
+    sscanf(a.c_str(),"a %d b %d c %d",&s1,&s2,&s3);
+    odpowiedz = 1;
+    if (s1 < 0)
+    {
+      dir1 = 1;
+      digitalWrite(X_DIR_PIN, dir1);
+      s1 = -s1;
+    }
+    else
+    {
+      dir1 = 0;
+      digitalWrite(X_DIR_PIN, dir1);
+    }
+    if (s2 < 0)
+    {
+      dir2 = 1;
+      digitalWrite(Y_DIR_PIN, dir2);
+      s2 = -s2;
+    }
+    else
+    {
+      dir2 = 0;
+      digitalWrite(Y_DIR_PIN, dir2);
+    }
+    if (s3 < 0)
+    {
+      dir3 = 1;
+      digitalWrite(Z_DIR_PIN, dir3);
+      s3 = -s3;
+    }
+    else
+    {
+      dir3 = 0;
+      digitalWrite(Z_DIR_PIN, dir3);
+    }
+    //Serial.println(s1);
+    //Serial.println(s2);
+    //Serial.println(s3);
+  }
+
+  if(s1==0 && s2==0 && s3==0 && odpowiedz == 1) 
+  {
+    Serial.println("SKONCZONE");
+    odpowiedz = 0;
+  }
+}
