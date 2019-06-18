@@ -1,3 +1,4 @@
+/* Dariusz Odzierejko, Oskar Łucewicz, Kacper Lipiński 2019 */
 #include<LiquidCrystal.h>
 
 #define MOSFET_D_PIN       10
