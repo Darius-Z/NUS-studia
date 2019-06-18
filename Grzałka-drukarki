@@ -1,0 +1,72 @@
+#include<LiquidCrystal.h>
+
+#define MOSFET_D_PIN       10
+#define TEMP_0_PIN         13
+#define HEATER_1_PIN   MOSFET_D_PIN
+#define RAMPS_D10_PIN      10
+
+#define a -6.184837329377493e-7
+#define b 0.001049454704165
+#define c -0.667263880799118
+#define d 2.505159083672874e+2
+
+LiquidCrystal lcd(16,17,23,25,27,29);
+
+int temp;
+double x,y;
+int h = 0;
+double e;
+double u; 
+double calka = 0;
+double predkosc;
+double stara;
+double P,I,D;
+
+void setup() 
+{
+  lcd.begin( 20, 4);
+  pinMode(HEATER_1_PIN, OUTPUT);
+}
+
+void loop() 
+{
+  
+ /* if(h < 50)
+    {
+      digitalWrite(HEATER_1_PIN, HIGH);
+      h++;
+    }
+  else
+      digitalWrite(HEATER_1_PIN,LOW);      
+      
+  delay(100);
+  */
+  lcd.setCursor(0,0);
+  temp = analogRead(13);
+  lcd.print(u);
+  x=(double) temp;
+  y=a*x*x*x+b*x*x+c*x+d;
+  lcd.print(" ");
+  lcd.print(y);
+  lcd.print(" Grzalka");
+ 
+  e = 100 - y;
+  predkosc = (y - stara)/ 0.1;
+  
+  if (y < 100)
+  calka = calka + e*0.1;
+
+  P = 255/80;
+  I = 0.2;
+  D = 1;
+
+  u = round(P*e + I*calka + D*predkosc);
+  //u=round(255/80*e + 0.2*calka);
+  
+  if (u<0) u=0;
+  if (u>255) u=255;
+  analogWrite(10, u);
+
+  stara = y;
+  delay(100);  
+}
